@@ -14,6 +14,8 @@ export function ModelComparison({ experiments }: ModelComparisonProps) {
           totalTime: 0,
           totalAccuracy: 0,
           totalRelevancy: 0,
+          totalCoherence: 0,
+          totalCompleteness: 0,
           successfulResponses: 0,
           validTimeResponses: 0
         };
@@ -27,13 +29,29 @@ export function ModelComparison({ experiments }: ModelComparisonProps) {
       }
 
       if (resp.metrics) {
-        if (typeof resp.metrics.accuracy_score === 'number' && !isNaN(resp.metrics.accuracy_score)) {
-          stats[resp.llm_name].totalAccuracy += resp.metrics.accuracy_score;
+        const metrics = resp.metrics;
+        let hasValidMetrics = false;
+
+        if (typeof metrics.accuracy_score === 'number' && !isNaN(metrics.accuracy_score)) {
+          stats[resp.llm_name].totalAccuracy += metrics.accuracy_score;
+          hasValidMetrics = true;
         }
-        if (typeof resp.metrics.relevancy_score === 'number' && !isNaN(resp.metrics.relevancy_score)) {
-          stats[resp.llm_name].totalRelevancy += resp.metrics.relevancy_score;
+        if (typeof metrics.relevancy_score === 'number' && !isNaN(metrics.relevancy_score)) {
+          stats[resp.llm_name].totalRelevancy += metrics.relevancy_score;
+          hasValidMetrics = true;
         }
-        stats[resp.llm_name].successfulResponses += 1;
+        if (typeof metrics.coherence_score === 'number' && !isNaN(metrics.coherence_score)) {
+          stats[resp.llm_name].totalCoherence += metrics.coherence_score;
+          hasValidMetrics = true;
+        }
+        if (typeof metrics.completeness_score === 'number' && !isNaN(metrics.completeness_score)) {
+          stats[resp.llm_name].totalCompleteness += metrics.completeness_score;
+          hasValidMetrics = true;
+        }
+        
+        if (hasValidMetrics) {
+          stats[resp.llm_name].successfulResponses += 1;
+        }
       }
     });
     return stats;
@@ -42,6 +60,8 @@ export function ModelComparison({ experiments }: ModelComparisonProps) {
     totalTime: number;
     totalAccuracy: number;
     totalRelevancy: number;
+    totalCoherence: number;
+    totalCompleteness: number;
     successfulResponses: number;
     validTimeResponses: number;
   }>);
@@ -78,6 +98,12 @@ export function ModelComparison({ experiments }: ModelComparisonProps) {
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Avg Relevancy
               </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Avg Coherence
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Avg Completeness
+              </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
@@ -97,6 +123,12 @@ export function ModelComparison({ experiments }: ModelComparisonProps) {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                   {formatMetric(stats.totalRelevancy, stats.successfulResponses)}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {formatMetric(stats.totalCoherence, stats.successfulResponses)}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {formatMetric(stats.totalCompleteness, stats.successfulResponses)}
                 </td>
               </tr>
             ))}

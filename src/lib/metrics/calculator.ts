@@ -29,11 +29,17 @@ export class MetricsCalculator {
       const coherenceScore = this.analyzers.coherence.analyze(text);
       const completenessScore = this.analyzers.completeness.analyze(text);
 
+      // Ensure scores are valid numbers between 0 and 1
+      const validateScore = (score: number) => {
+        if (typeof score !== 'number' || isNaN(score)) return 0;
+        return Math.max(0, Math.min(1, score));
+      };
+
       return {
-        accuracy_score: accuracyScore,
-        relevancy_score: relevancyScore,
-        coherence_score: coherenceScore,
-        completeness_score: completenessScore
+        accuracy_score: validateScore(accuracyScore),
+        relevancy_score: validateScore(relevancyScore),
+        coherence_score: validateScore(coherenceScore),
+        completeness_score: validateScore(completenessScore)
       };
     } catch (error) {
       console.error('Error calculating metrics:', error);
