@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { ResponseComparison } from './ResponseComparison';
 import type { Experiment } from '../types/database';

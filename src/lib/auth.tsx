@@ -9,20 +9,12 @@ interface AuthContextType {
   signOut: () => Promise<void>;
 }
 
-// Export the context so it can be imported by other components
 export const AuthContext = createContext<AuthContextType | null>(null);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
-    // Add note about potential ad blocker interference
-    console.info(
-      'Note: If you see a blocked fingerprint.js resource error in the console, ' +
-      'this is due to your ad blocker or privacy extension. ' +
-      'Core functionality will continue to work normally.'
-    );
-    
     // Check active sessions and sets the user
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
@@ -47,8 +39,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signOut = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) throw error;
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      // Clear user state after successful sign out
+      setUser(null);
+    } catch (error) {
+      console.error('Error signing out:', error);
+      // Still clear user state even if there's an error
+      setUser(null);
+      // Don't throw the error to prevent unhandled rejection
+    }
   };
 
   return (

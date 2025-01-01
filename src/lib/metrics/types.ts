@@ -1,8 +1,8 @@
 export interface MetricsResult {
-  accuracy_score: number | null;
-  relevancy_score: number | null;
-  coherence_score: number | null;
-  completeness_score: number | null;
+  accuracy_score: number;    // Changed from number | null
+  relevancy_score: number;   // Changed from number | null
+  coherence_score: number;   // Changed from number | null
+  completeness_score: number; // Changed from number | null
 }
 
 export interface TextAnalyzer {

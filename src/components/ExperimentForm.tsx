@@ -1,14 +1,12 @@
 import React, { useState } from 'react';
+import { Send, Loader2 } from 'lucide-react';
 import { ExamplePrompts } from './ExamplePrompts';
 import { useAuth } from '../hooks/useAuth';
-import { LLMService } from '../lib/llm/service';
 import { useExperimentSubmit } from '../hooks/useExperimentSubmit';
 import { ErrorMessage } from './ui/ErrorMessage';
 import { PromptInput } from './experiment/PromptInput';
 import { DescriptionInput } from './experiment/DescriptionInput';
 import { SubmitButton } from './experiment/SubmitButton';
-
-const llmService = new LLMService();
 
 export function ExperimentForm() {
   const [prompt, setPrompt] = useState('');
@@ -28,7 +26,6 @@ export function ExperimentForm() {
     <div className="grid md:grid-cols-3 gap-8">
       <form onSubmit={handleSubmit} className="md:col-span-2 space-y-4">
         {error && <ErrorMessage message={error} />}
-        
         <PromptInput value={prompt} onChange={setPrompt} />
         <DescriptionInput value={description} onChange={setDescription} />
         <SubmitButton isLoading={isLoading} />

@@ -16,15 +16,15 @@ export interface LLMResponse {
   response_time_ms: number;
   error?: string | null;
   created_at: string;
-  metrics?: Metrics | null;
+  metrics?: Metrics;
 }
 
 export interface Metrics {
   id: string;
   response_id: string;
-  accuracy_score: number | null;
-  relevancy_score: number | null;
-  coherence_score?: number | null;
-  completeness_score?: number | null;
+  accuracy_score: number;    // Changed from number | null
+  relevancy_score: number;   // Changed from number | null
+  coherence_score: number;   // Changed from number | null
+  completeness_score: number; // Changed from number | null
   created_at: string;
 }

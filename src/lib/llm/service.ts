@@ -22,26 +22,37 @@ export class LLMService {
     return Promise.all(
       this.providers.map(async (provider) => {
         try {
+          console.log(`Generating response for ${provider.name}...`);
           const response = await provider.generateResponse(prompt);
+          
+          if (!response.text) {
+            console.log(`No text response from ${provider.name}`);
+            return {
+              provider: provider.name,
+              text: null,
+              timeMs: 0,
+              metrics: null,
+              error: 'No response generated'
+            };
+          }
+
+          console.log(`Calculating metrics for ${provider.name}...`);
           const metrics = this.metricsCalculator.calculateMetrics(response.text);
+          
+          console.log(`${provider.name} metrics:`, metrics);
           
           return {
             provider: provider.name,
             text: response.text,
             timeMs: response.timeMs,
-            metrics: {
-              accuracy_score: metrics.accuracy_score,
-              relevancy_score: metrics.relevancy_score,
-              coherence_score: metrics.coherence_score,
-              completeness_score: metrics.completeness_score
-            },
+            metrics,
             error: null
           };
         } catch (error) {
           console.error(`Error with ${provider.name}:`, error);
           return {
             provider: provider.name,
-            text: '',
+            text: null,
             timeMs: 0,
             metrics: null,
             error: error instanceof Error ? error.message : 'Unknown error'

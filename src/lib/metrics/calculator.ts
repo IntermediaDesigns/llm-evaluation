@@ -3,6 +3,8 @@ import { AccuracyAnalyzer } from './analyzers/accuracy';
 import { RelevancyAnalyzer } from './analyzers/relevancy';
 import { CoherenceAnalyzer } from './analyzers/coherence';
 import { CompletenessAnalyzer } from './analyzers/completeness';
+import { calculateMetricScore } from './utils/scoreCalculator';
+import { validateText, createEmptyMetrics } from './utils/validation';
 
 export class MetricsCalculator {
   private analyzers = {
@@ -13,42 +15,24 @@ export class MetricsCalculator {
   };
 
   calculateMetrics(text: string): MetricsResult {
-    if (!text || typeof text !== 'string') {
-      return {
-        accuracy_score: null,
-        relevancy_score: null,
-        coherence_score: null,
-        completeness_score: null
-      };
+    if (!validateText(text)) {
+      console.log('Invalid text for metrics calculation:', text);
+      return createEmptyMetrics();
     }
 
     try {
-      // Calculate individual scores
-      const accuracyScore = this.analyzers.accuracy.analyze(text);
-      const relevancyScore = this.analyzers.relevancy.analyze(text);
-      const coherenceScore = this.analyzers.coherence.analyze(text);
-      const completenessScore = this.analyzers.completeness.analyze(text);
-
-      // Ensure scores are valid numbers between 0 and 1
-      const validateScore = (score: number) => {
-        if (typeof score !== 'number' || isNaN(score)) return 0;
-        return Math.max(0, Math.min(1, score));
+      const metrics = {
+        accuracy_score: calculateMetricScore(this.analyzers.accuracy, text),
+        relevancy_score: calculateMetricScore(this.analyzers.relevancy, text),
+        coherence_score: calculateMetricScore(this.analyzers.coherence, text),
+        completeness_score: calculateMetricScore(this.analyzers.completeness, text)
       };
 
-      return {
-        accuracy_score: validateScore(accuracyScore),
-        relevancy_score: validateScore(relevancyScore),
-        coherence_score: validateScore(coherenceScore),
-        completeness_score: validateScore(completenessScore)
-      };
+      console.log('Calculated metrics:', metrics);
+      return metrics;
     } catch (error) {
       console.error('Error calculating metrics:', error);
-      return {
-        accuracy_score: null,
-        relevancy_score: null,
-        coherence_score: null,
-        completeness_score: null
-      };
+      return createEmptyMetrics();
     }
   }
 }

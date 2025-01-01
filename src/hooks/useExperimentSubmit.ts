@@ -25,7 +25,7 @@ export function useExperimentSubmit() {
     setError(null);
 
     try {
-      // Create the experiment
+      console.log('Creating experiment...');
       const { data: experiment, error: experimentError } = await supabase
         .from('experiments')
         .insert([{ 
@@ -38,46 +38,62 @@ export function useExperimentSubmit() {
 
       if (experimentError) throw experimentError;
 
-      // Generate responses and calculate metrics
+      console.log('Generating responses...');
       const responses = await llmService.generateResponses(prompt);
+      console.log('Generated responses:', responses);
 
-      // Insert responses and metrics
       for (const response of responses) {
-        // Insert response
+        console.log(`Processing response from ${response.provider}...`);
+        
+        // Skip if no response was generated
+        if (!response.text && !response.error) {
+          console.log(`Skipping empty response from ${response.provider}`);
+          continue;
+        }
+
+        // Insert LLM response
+        console.log(`Inserting response for ${response.provider}...`);
         const { data: llmResponse, error: responseError } = await supabase
           .from('llm_responses')
           .insert({
             experiment_id: experiment.id,
             llm_name: response.provider,
-            response_text: response.text || response.error,
+            response_text: response.text || '',
             response_time_ms: response.timeMs,
             error: response.error
           })
           .select()
           .single();
 
-        if (responseError) throw responseError;
+        if (responseError) {
+          console.error('Error inserting response:', responseError);
+          throw responseError;
+        }
 
-        // Insert metrics if response was successful
-        if (!response.error && response.metrics) {
+        // Insert metrics if available
+        if (response.metrics && !response.error) {
+          console.log(`Inserting metrics for ${response.provider}...`, response.metrics);
           const { error: metricsError } = await supabase
             .from('metrics')
             .insert({
               response_id: llmResponse.id,
-              accuracy_score: response.metrics.accuracy_score,
-              relevancy_score: response.metrics.relevancy_score,
-              coherence_score: response.metrics.coherence_score,
-              completeness_score: response.metrics.completeness_score
+              accuracy_score: response.metrics.accuracy_score || 0,
+              relevancy_score: response.metrics.relevancy_score || 0,
+              coherence_score: response.metrics.coherence_score || 0,
+              completeness_score: response.metrics.completeness_score || 0
             });
 
-          if (metricsError) throw metricsError;
+          if (metricsError) {
+            console.error('Error inserting metrics:', metricsError);
+            throw metricsError;
+          }
         }
       }
 
-      // Refresh the page to show new responses
-      window.location.reload();
+      // Refresh experiments without page reload
+      window.dispatchEvent(new CustomEvent('experiment-created'));
     } catch (error) {
-      console.error('Error creating experiment:', error);
+      console.error('Error in experiment submission:', error);
       setError(error instanceof Error ? error.message : 'An error occurred');
     } finally {
       setIsLoading(false);
