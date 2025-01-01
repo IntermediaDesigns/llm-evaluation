@@ -5,6 +5,7 @@ export interface Experiment {
   description: string | null;
   created_at: string;
   updated_at: string;
+  llm_responses?: LLMResponse[];
 }
 
 export interface LLMResponse {
@@ -13,13 +14,17 @@ export interface LLMResponse {
   llm_name: string;
   response_text: string;
   response_time_ms: number;
+  error?: string | null;
   created_at: string;
+  metrics?: Metrics | null;
 }
 
 export interface Metrics {
   id: string;
   response_id: string;
-  accuracy_score: number;
-  relevancy_score: number;
+  accuracy_score: number | null;
+  relevancy_score: number | null;
+  coherence_score?: number | null;
+  completeness_score?: number | null;
   created_at: string;
 }
