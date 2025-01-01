@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useEffect, useState } from 'react';
 import { User } from '@supabase/supabase-js';
 import { supabase } from './supabase';
 
@@ -16,6 +16,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
+    // Add note about potential ad blocker interference
+    console.info(
+      'Note: If you see a blocked fingerprint.js resource error in the console, ' +
+      'this is due to your ad blocker or privacy extension. ' +
+      'Core functionality will continue to work normally.'
+    );
+    
     // Check active sessions and sets the user
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);

@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { BarChart, Activity, Clock } from 'lucide-react';
 import type { Experiment } from '../../types/database';
 
@@ -14,9 +14,11 @@ export function MetricsOverview({ experiments }: MetricsOverviewProps) {
   );
   
   const avgResponseTime = experiments.reduce((sum, exp) => {
-    const validResponses = exp.llm_responses?.filter(resp => 
+    if (!exp.llm_responses) return sum;
+    
+    const validResponses = exp.llm_responses.filter(resp => 
       typeof resp.response_time_ms === 'number' && !isNaN(resp.response_time_ms)
-    ) || [];
+    );
     
     if (validResponses.length === 0) return sum;
     
@@ -26,7 +28,7 @@ export function MetricsOverview({ experiments }: MetricsOverviewProps) {
     ) / validResponses.length;
     
     return sum + experimentAvg;
-  }, 0) / (experiments.filter(exp => exp.llm_responses?.length > 0).length || 1);
+  }, 0) / (experiments.filter(exp => exp.llm_responses && exp.llm_responses.length > 0).length || 1);
 
   const formatTime = (ms: number) => {
     if (isNaN(ms)) return 'N/A';

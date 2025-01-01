@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { Send, Loader2 } from 'lucide-react';
 
 interface SubmitButtonProps {

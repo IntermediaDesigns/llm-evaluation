@@ -1,6 +1,4 @@
 import React, { useState } from 'react';
-import { Send, Loader2 } from 'lucide-react';
-import { supabase } from '../lib/supabase';
 import { ExamplePrompts } from './ExamplePrompts';
 import { useAuth } from '../hooks/useAuth';
 import { LLMService } from '../lib/llm/service';

@@ -1,4 +1,3 @@
-import React from 'react';
 import { Clock, ThumbsUp, Brain, AlertCircle, Zap, CheckCircle } from 'lucide-react';
 import type { LLMResponse, Metrics } from '../types/database';
 

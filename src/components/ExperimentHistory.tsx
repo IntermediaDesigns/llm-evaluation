@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Trash2, Loader2 } from 'lucide-react';
 import { ResponseComparison } from './ResponseComparison';
 import { useExperiments } from '../hooks/useExperiments';

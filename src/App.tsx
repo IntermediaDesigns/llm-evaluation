@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Bot, History, BarChart3 } from 'lucide-react';
 import { ExperimentForm } from './components/ExperimentForm';
 import { LatestExperiment } from './components/LatestExperiment';
@@ -8,6 +8,14 @@ import { AuthRequired } from './components/AuthRequired';
 
 export default function App() {
   const [view, setView] = useState<'latest' | 'history' | 'analytics'>('latest');
+
+  useEffect(() => {
+    console.info(
+      'Note: If you see a blocked fingerprint.js resource warning in the console, ' +
+      'this is expected behavior from your ad blocker or privacy extension. ' +
+      'The application will continue to function normally.'
+    );
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50">
